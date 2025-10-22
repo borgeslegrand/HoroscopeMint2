@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+    <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quests - HoroscopeMint</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5CF6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/storage.js"></script>
+    <script src="js/social.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .quest-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .quest-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .reward-badge {
+            background: rgba(255, 255, 255, 0.9);
+            color: #0a0a0a;
+            font-weight: 600;
+        }
+        
+        .completed-btn {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .pending-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4 max-w-md mx-auto">
+        <!-- Header -->
+        <div class="mb-8 relative">
+            <div class="absolute top-0 right-0">
+                <button id="connectWalletBtn" onclick="connectWallet()" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                    <span id="walletBtnText">Connect Wallet</span>
+                </button>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">Quests</h1>
+            <p class="text-gray-400 text-lg">Complete your daily tasks in HoroscopeMint and earn rewards</p>
+        </div>
+                    
+        <!-- Quest Cards -->
+        <div class="space-y-4">
+            <!-- Daily Check-in Quest -->
+            <div class="quest-card rounded-2xl p-6">
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-2xl">📅</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-white mb-2">Daily Check-in</h3>
+                        <p class="text-gray-400 mb-4">Visit HoroscopeMint and claim your daily point</p>
+                        <div class="flex items-center justify-between">
+                            <div class="reward-badge px-3 py-1 rounded-full text-sm">+1 Point</div>
+                            <button onclick="completeQuest(1)" id="quest1Btn" class="completed-btn px-4 py-2 rounded-lg text-sm">
+                                <span class="flex items-center space-x-2">
+                                    <span>✓</span>
+                                    <span>Completed Today</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- NFT Mint Quest -->
+            <div class="quest-card rounded-2xl p-6">
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-2xl">💎</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-white mb-2">NFT Mint</h3>
+                        <p class="text-gray-400 mb-4">Mint your horoscope reading as NFT</p>
+                        <div class="flex items-center justify-between">
+                            <div class="reward-badge px-3 py-1 rounded-full text-sm">+10 Points</div>
+                            <button onclick="completeQuest(2)" id="quest2Btn" class="pending-btn px-4 py-2 rounded-lg text-sm" disabled>
+                                <span class="flex items-center space-x-2">
+                                    <span>⏳</span>
+                                    <span>Connect Wallet</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                        </div>
+                    </div>
+
+            <!-- Horoscope Reading Quest -->
+            <div class="quest-card rounded-2xl p-6">
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-2xl">⭐</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-white mb-2">Horoscope Reading</h3>
+                        <p class="text-gray-400 mb-4">Read your daily horoscope</p>
+                        <div class="flex items-center justify-between">
+                            <div class="reward-badge px-3 py-1 rounded-full text-sm">+2 Points</div>
+                            <button onclick="completeQuest(3)" id="quest3Btn" class="pending-btn px-4 py-2 rounded-lg text-sm" disabled>
+                                <span class="flex items-center space-x-2">
+                                    <span>⏳</span>
+                                    <span>Connect Wallet</span>
+                                </span>
+                            </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- Social Share Quest -->
+            <div class="quest-card rounded-2xl p-6">
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="text-2xl">📱</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-white mb-2">Social Share</h3>
+                        <p class="text-gray-400 mb-4">Share your horoscope on social media</p>
+                        <div class="flex items-center justify-between">
+                            <div class="reward-badge px-3 py-1 rounded-full text-sm">+3 Points</div>
+                            <button onclick="completeQuest(4)" id="quest4Btn" class="pending-btn px-4 py-2 rounded-lg text-sm" disabled>
+                                <span class="flex items-center space-x-2">
+                                    <span>⏳</span>
+                                    <span>Connect Wallet</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-black/50 backdrop-blur-lg border-t border-white/20 p-4 max-w-md mx-auto">
+            <div class="flex justify-around items-center">
+                <a href="home.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">🏠</div>
+                    <span class="text-xs font-medium">Home</span>
+                </a>
+                <a href="quest.html" class="flex flex-col items-center space-y-1 text-purple-400">
+                    <div class="w-6 h-6">⚡</div>
+                    <span class="text-xs font-medium">Quests</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">👤</div>
+                    <span class="text-xs font-medium">Profile</span>
+                </a>
+                <a href="faq.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">❓</div>
+                    <span class="text-xs font-medium">FAQ</span>
+                </a>
+                <button id="boardButton" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors cursor-pointer" style="pointer-events: auto;">
+                    <div class="w-6 h-6">🏆</div>
+                    <span class="text-xs font-medium">Board</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add bottom padding to prevent overlap with navigation -->
+        <div class="h-20"></div>
+                </div>
+                
+    <script>
+        let questStatus = {
+            1: true,  // Daily check-in completed
+            2: false, // NFT mint pending
+            3: false, // Horoscope reading pending
+            4: false  // Social share pending
+        };
+
+        let isWalletConnected = false;
+        let userAddress = null;
+
+        // Check if wallet is already connected
+        function checkWalletConnection() {
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.request({ method: 'eth_accounts' })
+                    .then(accounts => {
+                        if (accounts.length > 0) {
+                            isWalletConnected = true;
+                            userAddress = accounts[0];
+                            updateWalletUI();
+                        }
+                    })
+                    .catch(console.error);
+            }
+        }
+
+        async function connectWallet() {
+            // Check for Farcaster Frame support first
+            if (window.farcaster) {
+                try {
+                    const result = await window.farcaster.connect();
+                    if (result.success) {
+                        isWalletConnected = true;
+                        userAddress = result.address;
+                        updateWalletUI();
+                        enableQuestButtons();
+                        return;
+                    }
+                } catch (error) {
+                    console.log('Farcaster not available, trying MetaMask...');
+                }
+            }
+
+            // Fallback to MetaMask
+            if (typeof window.ethereum === 'undefined') {
+                alert('Please install MetaMask or use Farcaster to continue.');
+                return;
+            }
+
+            try {
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (accounts.length > 0) {
+                    isWalletConnected = true;
+                    userAddress = accounts[0];
+                    updateWalletUI();
+                    enableQuestButtons();
+                }
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('Failed to connect wallet. Please try again.');
+            }
+        }
+
+        function updateWalletUI() {
+            const walletBtn = document.getElementById('connectWalletBtn');
+            const walletBtnText = document.getElementById('walletBtnText');
+            
+            if (isWalletConnected) {
+                walletBtn.className = 'flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors';
+                walletBtnText.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+            } else {
+                walletBtn.className = 'flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors';
+                walletBtnText.textContent = 'Connect Wallet';
+            }
+        }
+
+        function enableQuestButtons() {
+            // Enable quest buttons 2, 3, 4 (quest 1 is already completed)
+            for (let i = 2; i <= 4; i++) {
+                const btn = document.getElementById(`quest${i}Btn`);
+                btn.disabled = false;
+                btn.className = 'pending-btn px-4 py-2 rounded-lg text-sm';
+                btn.innerHTML = `<span class="flex items-center space-x-2"><span>⏳</span><span>Pending</span></span>`;
+            }
+        }
+
+        function completeQuest(questId) {
+            if (!isWalletConnected) {
+                alert('Please connect your wallet first.');
+                return;
+            }
+
+            if (questStatus[questId]) {
+                return; // Already completed
+            }
+            
+            questStatus[questId] = true;
+            const btn = document.getElementById(`quest${questId}Btn`);
+            
+            btn.className = 'completed-btn px-4 py-2 rounded-lg text-sm';
+            btn.innerHTML = `<span class="flex items-center space-x-2"><span>✓</span><span>Completed</span></span>`;
+            
+            // Show success animation
+            btn.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 200);
+
+            // Simulate blockchain transaction for quest completion
+            simulateBlockchainTransaction(questId);
+        }
+
+        function simulateBlockchainTransaction(questId) {
+            // Simulate transaction processing
+            console.log(`Quest ${questId} completed on Base network`);
+            console.log(`User address: ${userAddress}`);
+            
+            // In a real implementation, this would interact with smart contracts
+            // For now, we'll just log the completion
+            const questNames = {
+                1: 'Daily Check-in',
+                2: 'NFT Mint',
+                3: 'Horoscope Reading',
+                4: 'Social Share'
+            };
+            
+            console.log(`${questNames[questId]} quest completed successfully!`);
+        }
+
+        // Board navigation functions
+        function showLeaderboard() {
+            console.log('Board button clicked!');
+            // Redirect to preview.html which has the leaderboard
+            window.location.href = 'preview.html';
+        }
+
+        // Initialize wallet connection check
+        checkWalletConnection();
+        
+        // Add Board button event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const boardButton = document.getElementById('boardButton');
+            if (boardButton) {
+                boardButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Board button clicked via event listener!');
+                    showLeaderboard();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HoroscopeMint - Farcaster Frame</title>
+    
+    <!-- Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext">
+    <meta property="fc:frame:image" content="https://horoscopemint.com/logo.png">
+    <meta property="fc:frame:button:1" content="Get Daily Horoscope">
+    <meta property="fc:frame:button:2" content="View Quests">
+    <meta property="fc:frame:button:3" content="Open App">
+    <meta property="fc:frame:post_url" content="https://horoscopemint.com/api/frame">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="HoroscopeMint - Daily Horoscope & NFT Minting">
+    <meta property="og:description" content="Get your personalized daily horoscope and mint it as NFT on Base network">
+    <meta property="og:image" content="https://horoscopemint.com/logo.png">
+    <meta property="og:url" content="https://horoscopemint.com">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HoroscopeMint - Daily Horoscope & NFT Minting">
+    <meta name="twitter:description" content="Get your personalized daily horoscope and mint it as NFT on Base network">
+    <meta name="twitter:image" content="https://horoscopemint.com/logo.png">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+        
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #8B5CF6, #EC4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #A1A1AA;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #8B5CF6, #EC4899);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #7C3AED, #DB2777);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-desc {
+            color: #A1A1AA;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🔮</div>
+        <h1 class="title">HoroscopeMint</h1>
+        <p class="subtitle">
+            Get your personalized daily horoscope and mint it as NFT on Base network. 
+            Connect with Farcaster and earn rewards through daily quests.
+        </p>
+        
+        <div class="buttons">
+            <a href="home.html" class="btn btn-primary">Open HoroscopeMint</a>
+            <a href="quest.html" class="btn">View Daily Quests</a>
+            <a href="profile.html" class="btn">My Profile</a>
+            <a href="faq.html" class="btn">FAQ</a>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">♈</div>
+                <div class="feature-title">Daily Horoscopes</div>
+                <div class="feature-desc">Personalized readings for all 12 zodiac signs</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💎</div>
+                <div class="feature-title">NFT Minting</div>
+                <div class="feature-desc">Mint your horoscope as NFT on Base network</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Daily Quests</div>
+                <div class="feature-desc">Complete tasks and earn points</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔗</div>
+                <div class="feature-title">Farcaster Integration</div>
+                <div class="feature-desc">Seamless social experience</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Farcaster Frame detection
+        if (window.farcaster) {
+            console.log('Farcaster Frame detected');
+            
+            // Handle frame interactions
+            window.farcaster.on('buttonClick', (data) => {
+                console.log('Frame button clicked:', data);
+                
+                switch (data.buttonIndex) {
+                    case 1:
+                        window.location.href = 'home.html';
+                        break;
+                    case 2:
+                        window.location.href = 'quest.html';
+                        break;
+                    case 3:
+                        window.location.href = 'home.html';
+                        break;
+                }
+            });
+        }
+        
+        // Auto-redirect for mobile users
+        if (window.innerWidth <= 768) {
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

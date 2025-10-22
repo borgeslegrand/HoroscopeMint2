@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FAQ - HoroscopeMint</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5CF6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/storage.js"></script>
+    <script src="js/social.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .faq-item {
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-content.active {
+            max-height: 200px;
+        }
+        
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        
+        .chevron.rotated {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4 max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">HoroscopeMint — Frequently Asked Questions</h1>
+            <p class="text-gray-400 text-lg">FAQ for HoroscopeMint miniapp on the Base network.</p>
+        </div>
+
+        <!-- FAQ Items -->
+        <div class="space-y-4">
+            <!-- FAQ Item 1 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(1)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">1.</span>
+                        <span class="text-white font-medium">What is HoroscopeMint?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-1">
+                    <p class="text-gray-300 text-sm">HoroscopeMint is a digital horoscope platform where you can get daily personalized horoscope readings based on your zodiac sign and mint them as NFTs on the Base network.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(2)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">2.</span>
+                        <span class="text-white font-medium">Which network does it run on?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-2">
+                    <p class="text-gray-300 text-sm">HoroscopeMint runs entirely on the Base network, providing fast and low-cost transactions for daily check-ins and NFT minting.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(3)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">3.</span>
+                        <span class="text-white font-medium">How much is the minting fee?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-3">
+                    <p class="text-gray-300 text-sm">Each NFT minting requires 1 USDC + gas fee. Daily check-ins are free and earn you 1 point each.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(4)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">4.</span>
+                        <span class="text-white font-medium">Which payment methods are supported?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-4">
+                    <p class="text-gray-300 text-sm">Currently, only USDC on the Base network is supported for NFT minting. Daily check-ins are completely free.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 5 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(5)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">5.</span>
+                        <span class="text-white font-medium">How do I get daily horoscope readings?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-5">
+                    <p class="text-gray-300 text-sm">Simply select your zodiac sign and category, then click "Check-in" to receive your personalized daily horoscope reading. You can mint it as an NFT for 1 USDC if you want to keep it permanently.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 6 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(6)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">6.</span>
+                        <span class="text-white font-medium">What categories are available?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-6">
+                    <p class="text-gray-300 text-sm">We offer 5 categories: Love & Relationships, Money & Career, Crypto & Investment, Career & Success, and NFT & Digital Assets.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 7 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(7)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">7.</span>
+                        <span class="text-white font-medium">How does the point system work?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-7">
+                    <p class="text-gray-300 text-sm">Daily check-ins earn you 1 point each, while minting an NFT earns you 10 points. Points are tracked in your profile and contribute to your overall ranking.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Item 8 -->
+            <div class="faq-item card rounded-xl p-4 cursor-pointer" onclick="toggleFAQ(8)">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-white font-bold">8.</span>
+                        <span class="text-white font-medium">Is HoroscopeMint free to use?</span>
+                    </div>
+                    <svg class="w-5 h-5 text-white chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="faq-content mt-3" id="faq-content-8">
+                    <p class="text-gray-300 text-sm">Yes! Daily horoscope readings and check-ins are completely free. You only pay when you choose to mint your horoscope as an NFT (1 USDC + gas).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-black/50 backdrop-blur-lg border-t border-white/20 p-4 max-w-md mx-auto">
+            <div class="flex justify-around items-center">
+                <a href="home.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">🏠</div>
+                    <span class="text-xs font-medium">Home</span>
+                </a>
+                <a href="quest.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">⚡</div>
+                    <span class="text-xs font-medium">Quests</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">👤</div>
+                    <span class="text-xs font-medium">Profile</span>
+                </a>
+                <a href="faq.html" class="flex flex-col items-center space-y-1 text-purple-400">
+                    <div class="w-6 h-6">❓</div>
+                    <span class="text-xs font-medium">FAQ</span>
+                </a>
+                <button id="boardButton" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors cursor-pointer" style="pointer-events: auto;">
+                    <div class="w-6 h-6">🏆</div>
+                    <span class="text-xs font-medium">Board</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add bottom padding to prevent overlap with navigation -->
+        <div class="h-20"></div>
+    </div>
+
+    <script>
+        function toggleFAQ(faqNumber) {
+            const content = document.getElementById(`faq-content-${faqNumber}`);
+            const chevron = content.previousElementSibling.querySelector('.chevron');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                chevron.classList.remove('rotated');
+            } else {
+                // Close all other FAQs
+                document.querySelectorAll('.faq-content.active').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelectorAll('.chevron.rotated').forEach(item => {
+                    item.classList.remove('rotated');
+                });
+                
+                // Open current FAQ
+                content.classList.add('active');
+                chevron.classList.add('rotated');
+            }
+        }
+
+        // Board navigation functions
+        function showLeaderboard() {
+            console.log('Board button clicked!');
+            // Redirect to preview.html which has the leaderboard
+            window.location.href = 'preview.html';
+        }
+
+        // Add Board button event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const boardButton = document.getElementById('boardButton');
+            if (boardButton) {
+                boardButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Board button clicked via event listener!');
+                    showLeaderboard();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

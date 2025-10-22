@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Home - HoroscopeMint</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5CF6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <!-- Farcaster Frame Meta Tags -->
+    <meta property="fc:frame" content="vNext">
+    <meta property="fc:frame:image" content="https://horoscopemint.com/logo.png">
+    <meta property="fc:frame:button:1" content="Get Daily Horoscope">
+    <meta property="fc:frame:button:2" content="Mint as NFT">
+    <meta property="fc:frame:post_url" content="https://horoscopemint.com/api/frame">
+    <meta property="og:title" content="HoroscopeMint - Daily Horoscope & NFT Minting">
+    <meta property="og:description" content="Get your personalized daily horoscope and mint it as NFT on Base network">
+    <meta property="og:image" content="https://horoscopemint.com/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" onerror="console.error('Failed to load ethers.js')"></script>
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/storage.js"></script>
+    <script src="js/social.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .zodiac-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .zodiac-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .zodiac-card.selected {
+            border: 2px solid #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .category-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .category-card.selected {
+            border: 2px solid #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .horoscope-display {
+            display: none;
+        }
+        
+        .horoscope-display.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .mint-section {
+            display: none;
+        }
+        
+        .mint-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4 max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-4xl font-bold text-white">HoroscopeMint</h1>
+                <button id="connectWalletBtn" onclick="connectWallet()" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                    <span id="walletBtnText">Connect Wallet</span>
+                </button>
+            </div>
+            <p class="text-gray-400 text-lg">Get your daily horoscope and mint it as NFT</p>
+        </div>
+
+        <!-- Zodiac Selection -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">Choose Your Zodiac Sign</h2>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(0)">
+                    <div class="text-3xl mb-2">♈</div>
+                    <div class="text-white font-medium">Aries</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(1)">
+                    <div class="text-3xl mb-2">♉</div>
+                    <div class="text-white font-medium">Taurus</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(2)">
+                    <div class="text-3xl mb-2">♊</div>
+                    <div class="text-white font-medium">Gemini</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(3)">
+                    <div class="text-3xl mb-2">♋</div>
+                    <div class="text-white font-medium">Cancer</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(4)">
+                    <div class="text-3xl mb-2">♌</div>
+                    <div class="text-white font-medium">Leo</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(5)">
+                    <div class="text-3xl mb-2">♍</div>
+                    <div class="text-white font-medium">Virgo</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(6)">
+                    <div class="text-3xl mb-2">♎</div>
+                    <div class="text-white font-medium">Libra</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(7)">
+                    <div class="text-3xl mb-2">♏</div>
+                    <div class="text-white font-medium">Scorpio</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(8)">
+                    <div class="text-3xl mb-2">♐</div>
+                    <div class="text-white font-medium">Sagittarius</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(9)">
+                    <div class="text-3xl mb-2">♑</div>
+                    <div class="text-white font-medium">Capricorn</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(10)">
+                    <div class="text-3xl mb-2">♒</div>
+                    <div class="text-white font-medium">Aquarius</div>
+                </div>
+                <div class="zodiac-card card rounded-xl p-4 text-center" onclick="selectZodiac(11)">
+                    <div class="text-3xl mb-2">♓</div>
+                    <div class="text-white font-medium">Pisces</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Selection -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">Choose Category</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="category-card card rounded-xl p-4 text-center" onclick="selectCategory(0)">
+                    <div class="text-2xl mb-2">💕</div>
+                    <div class="text-white font-medium">Love</div>
+                </div>
+                <div class="category-card card rounded-xl p-4 text-center" onclick="selectCategory(1)">
+                    <div class="text-2xl mb-2">💰</div>
+                    <div class="text-white font-medium">Money</div>
+                </div>
+                <div class="category-card card rounded-xl p-4 text-center" onclick="selectCategory(2)">
+                    <div class="text-2xl mb-2">💼</div>
+                    <div class="text-white font-medium">Career</div>
+                </div>
+                <div class="category-card card rounded-xl p-4 text-center" onclick="selectCategory(3)">
+                    <div class="text-2xl mb-2">₿</div>
+                    <div class="text-white font-medium">Crypto</div>
+                </div>
+                <div class="category-card card rounded-xl p-4 text-center" onclick="selectCategory(4)">
+                    <div class="text-2xl mb-2">🎨</div>
+                    <div class="text-white font-medium">NFT</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Check-in Button -->
+        <div class="mb-8">
+            <button id="checkInBtn" onclick="checkIn()" class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-xl transition-colors" disabled>
+                Get Daily Horoscope
+            </button>
+        </div>
+
+        <!-- Horoscope Display -->
+        <div id="horoscopeDisplay" class="horoscope-display card rounded-xl p-6 mb-6">
+            <div class="text-center mb-4">
+                <div id="horoscopeSymbol" class="text-4xl mb-2"></div>
+                <h3 id="horoscopeTitle" class="text-2xl font-bold text-white mb-2"></h3>
+            </div>
+            <div class="mb-4">
+                <p id="horoscopeMessage" class="text-gray-300 leading-relaxed"></p>
+            </div>
+            <div class="text-center">
+                <div class="text-yellow-400 font-bold text-lg">Today's Lucky Number: <span id="luckyNumber"></span></div>
+            </div>
+        </div>
+
+        <!-- Mint Section -->
+        <div id="mintSection" class="mint-section card rounded-xl p-6 mb-6">
+            <div class="text-center mb-4">
+                <h3 class="text-xl font-bold text-white mb-2">Mint Your Horoscope as NFT</h3>
+                <p class="text-gray-400">Turn your daily horoscope into a unique NFT on Base network</p>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-white">Minting Fee:</span>
+                    <span class="text-yellow-400 font-bold">1 USDC + Gas</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-white">Points Earned:</span>
+                    <span class="text-green-400 font-bold">+10 Points</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-white">Network:</span>
+                    <span class="text-blue-400 font-bold">Base Network</span>
+                </div>
+                <div id="paymentStatus" class="hidden text-center">
+                    <div class="text-yellow-400 mb-2">⏳ Processing payment...</div>
+                    <div class="text-sm text-gray-400">Please confirm the transaction in your wallet</div>
+                </div>
+                <button id="mintBtn" onclick="mintHoroscope()" class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                    Mint as NFT (1 USDC)
+                </button>
+                <div id="transactionInfo" class="hidden text-center text-sm text-gray-400">
+                    <div>Transaction Hash: <span id="txHash" class="text-blue-400"></span></div>
+                    <div>View on <a id="explorerLink" href="#" target="_blank" class="text-blue-400 hover:underline">BaseScan</a></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-black/50 backdrop-blur-lg border-t border-white/20 p-4 max-w-md mx-auto">
+            <div class="flex justify-around items-center">
+                <a href="home.html" class="flex flex-col items-center space-y-1 text-purple-400">
+                    <div class="w-6 h-6">🏠</div>
+                    <span class="text-xs font-medium">Home</span>
+                </a>
+                <a href="quest.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">⚡</div>
+                    <span class="text-xs font-medium">Quests</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">👤</div>
+                    <span class="text-xs font-medium">Profile</span>
+                </a>
+                <a href="faq.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">❓</div>
+                    <span class="text-xs font-medium">FAQ</span>
+                </a>
+                <button id="boardButton" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors cursor-pointer" style="pointer-events: auto;">
+                    <div class="w-6 h-6">🏆</div>
+                    <span class="text-xs font-medium">Board</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add bottom padding to prevent overlap with navigation -->
+        <div class="h-20"></div>
+    </div>
+
+    <script>
+        let selectedZodiac = null;
+        let selectedCategory = null;
+        let isWalletConnected = false;
+        let userAddress = null;
+        let provider = null;
+        let signer = null;
+        
+        // BASE Network Configuration
+        const BASE_CHAIN_ID = '0x2105'; // Base Mainnet
+        const BASE_RPC_URL = 'https://mainnet.base.org';
+        const USDC_CONTRACT_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // USDC on Base
+        const HOROSCOPE_CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890'; // Placeholder contract address
+        
+        // Contract ABIs (simplified for demo)
+        const USDC_ABI = [
+            "function approve(address spender, uint256 amount) returns (bool)",
+            "function balanceOf(address owner) view returns (uint256)",
+            "function transfer(address to, uint256 amount) returns (bool)"
+        ];
+        
+        const HOROSCOPE_ABI = [
+            "function mintHoroscope(string memory horoscopeData, uint256 zodiacSign, uint256 category) payable returns (uint256)",
+            "function getHoroscopeNFT(uint256 tokenId) view returns (string memory, uint256, uint256)"
+        ];
+
+        const zodiacSigns = [
+            { symbol: '♈', name: 'Aries' },
+            { symbol: '♉', name: 'Taurus' },
+            { symbol: '♊', name: 'Gemini' },
+            { symbol: '♋', name: 'Cancer' },
+            { symbol: '♌', name: 'Leo' },
+            { symbol: '♍', name: 'Virgo' },
+            { symbol: '♎', name: 'Libra' },
+            { symbol: '♏', name: 'Scorpio' },
+            { symbol: '♐', name: 'Sagittarius' },
+            { symbol: '♑', name: 'Capricorn' },
+            { symbol: '♒', name: 'Aquarius' },
+            { symbol: '♓', name: 'Pisces' }
+        ];
+
+        const categories = ['Love', 'Money', 'Career', 'Crypto', 'NFT'];
+
+        function selectZodiac(index) {
+            // Remove previous selection
+            document.querySelectorAll('.zodiac-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            event.currentTarget.classList.add('selected');
+            selectedZodiac = index;
+            
+            updateCheckInButton();
+        }
+
+        function selectCategory(index) {
+            // Remove previous selection
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked card
+            event.currentTarget.classList.add('selected');
+            selectedCategory = index;
+            
+            updateCheckInButton();
+        }
+
+        function updateCheckInButton() {
+            const checkInBtn = document.getElementById('checkInBtn');
+            if (selectedZodiac !== null && selectedCategory !== null) {
+                checkInBtn.disabled = false;
+                checkInBtn.textContent = 'Get Daily Horoscope';
+            } else {
+                checkInBtn.disabled = true;
+                checkInBtn.textContent = 'Select Zodiac & Category';
+            }
+        }
+
+        function checkIn() {
+            if (selectedZodiac === null || selectedCategory === null) {
+                alert('Please select both zodiac sign and category');
+                return;
+            }
+
+            // Generate horoscope message
+            const horoscopeMessage = generateHoroscopeMessage(selectedZodiac, selectedCategory);
+            const luckyNumber = Math.floor(Math.random() * 100) + 1;
+
+            // Display horoscope
+            document.getElementById('horoscopeSymbol').textContent = zodiacSigns[selectedZodiac].symbol;
+            document.getElementById('horoscopeTitle').textContent = zodiacSigns[selectedZodiac].name;
+            document.getElementById('horoscopeMessage').textContent = horoscopeMessage;
+            document.getElementById('luckyNumber').textContent = luckyNumber;
+
+            // Show horoscope display
+            document.getElementById('horoscopeDisplay').classList.add('show');
+            document.getElementById('mintSection').classList.add('show');
+
+            // Scroll to horoscope
+            document.getElementById('horoscopeDisplay').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateHoroscopeMessage(zodiacIndex, categoryIndex) {
+            const messages = {
+                Love: [
+                    "Venus aligns with your sign today, bringing unexpected romantic opportunities. Trust your intuition when meeting new people, as cosmic forces are working in your favor.",
+                    "The stars suggest a deep emotional connection is forming. Be open to vulnerability and authentic communication in your relationships.",
+                    "Mercury's influence brings clarity to your love life. Express your feelings honestly and listen to your partner's needs with an open heart."
+                ],
+                Money: [
+                    "Jupiter's influence brings financial opportunities your way. Trust your instincts when making investment decisions, but avoid impulsive spending.",
+                    "The cosmic alignment favors long-term financial planning. Consider diversifying your portfolio and exploring new income streams.",
+                    "Saturn's lessons about patience apply to your finances today. Delayed gratification will lead to greater rewards in the future."
+                ],
+                Career: [
+                    "Mars energizes your professional life today. Take initiative on projects and don't hesitate to showcase your unique talents to superiors.",
+                    "The full moon's energy amplifies your leadership potential. Step into roles that challenge you and demonstrate your capabilities.",
+                    "Uranus brings unexpected career opportunities. Be flexible and open to unconventional paths that may lead to greater fulfillment."
+                ],
+                Crypto: [
+                    "The digital realm aligns with your sign today. Trust your research when making crypto decisions, but remember to diversify your portfolio.",
+                    "Neptune's influence suggests looking beyond surface-level trends. Focus on projects with strong fundamentals and long-term vision.",
+                    "Pluto's transformative energy affects the crypto market. Consider this a time for strategic repositioning rather than emotional trading."
+                ],
+                NFT: [
+                    "The creative cosmos flows through your sign today. Your artistic vision has the potential to create valuable digital assets.",
+                    "Venus in your creative sector suggests exploring NFT projects that align with your personal values and artistic expression.",
+                    "The stars favor collaboration in the digital art space. Consider partnering with other creators to amplify your impact."
+                ]
+            };
+
+            const categoryMessages = messages[categories[categoryIndex]];
+            const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+            const messageIndex = (dayOfYear + zodiacIndex + categoryIndex) % categoryMessages.length;
+            
+            return categoryMessages[messageIndex];
+        }
+
+        async function mintHoroscope() {
+            if (!isWalletConnected) {
+                alert('Please connect your wallet first');
+                return;
+            }
+
+            if (!provider || !signer) {
+                alert('Wallet not properly connected. Please reconnect.');
+                return;
+            }
+
+            try {
+                // Show payment status
+                document.getElementById('paymentStatus').classList.remove('hidden');
+                document.getElementById('mintBtn').disabled = true;
+                document.getElementById('mintBtn').textContent = 'Processing...';
+
+                // Check if we're on Base network
+                const network = await provider.getNetwork();
+                if (network.chainId !== parseInt(BASE_CHAIN_ID, 16)) {
+                    await switchToBaseNetwork();
+                }
+
+                // Get USDC contract instance
+                const usdcContract = new ethers.Contract(USDC_CONTRACT_ADDRESS, USDC_ABI, signer);
+                
+                // Check USDC balance (1 USDC = 1,000,000 units with 6 decimals)
+                const usdcBalance = await usdcContract.balanceOf(userAddress);
+                const requiredAmount = ethers.utils.parseUnits('1', 6); // 1 USDC
+
+                if (usdcBalance.lt(requiredAmount)) {
+                    alert('Insufficient USDC balance. You need at least 1 USDC to mint.');
+                    resetMintButton();
+                    return;
+                }
+
+                // Get horoscope data
+                const horoscopeData = {
+                    message: document.getElementById('horoscopeMessage').textContent,
+                    zodiac: zodiacSigns[selectedZodiac].name,
+                    category: categories[selectedCategory],
+                    luckyNumber: document.getElementById('luckyNumber').textContent,
+                    timestamp: Date.now()
+                };
+
+                // Approve USDC spending
+                const approveTx = await usdcContract.approve(HOROSCOPE_CONTRACT_ADDRESS, requiredAmount);
+                await approveTx.wait();
+
+                // Mint the horoscope NFT
+                const horoscopeContract = new ethers.Contract(HOROSCOPE_CONTRACT_ADDRESS, HOROSCOPE_ABI, signer);
+                const mintTx = await horoscopeContract.mintHoroscope(
+                    JSON.stringify(horoscopeData),
+                    selectedZodiac,
+                    selectedCategory,
+                    { value: ethers.utils.parseEther('0.001') } // Small ETH amount for gas
+                );
+
+                // Wait for transaction confirmation
+                const receipt = await mintTx.wait();
+                
+                // Show success
+                document.getElementById('paymentStatus').classList.add('hidden');
+                document.getElementById('transactionInfo').classList.remove('hidden');
+                document.getElementById('txHash').textContent = receipt.transactionHash;
+                document.getElementById('explorerLink').href = `https://basescan.org/tx/${receipt.transactionHash}`;
+                
+                // Update UI
+                document.getElementById('mintBtn').textContent = '✅ Minted Successfully!';
+                document.getElementById('mintBtn').className = 'w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors cursor-not-allowed';
+                
+                // Update user points (simulate)
+                updateUserPoints(10);
+                
+                alert('Horoscope NFT minted successfully! You earned 10 points.');
+
+            } catch (error) {
+                console.error('Minting error:', error);
+                alert('Failed to mint NFT: ' + error.message);
+                resetMintButton();
+            }
+        }
+
+        function resetMintButton() {
+            document.getElementById('paymentStatus').classList.add('hidden');
+            document.getElementById('mintBtn').disabled = false;
+            document.getElementById('mintBtn').textContent = 'Mint as NFT (1 USDC)';
+            document.getElementById('mintBtn').className = 'w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors';
+        }
+
+        async function switchToBaseNetwork() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: BASE_CHAIN_ID }],
+                });
+            } catch (switchError) {
+                // If the network doesn't exist, add it
+                if (switchError.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: BASE_CHAIN_ID,
+                                chainName: 'Base',
+                                rpcUrls: [BASE_RPC_URL],
+                                nativeCurrency: {
+                                    name: 'Ethereum',
+                                    symbol: 'ETH',
+                                    decimals: 18,
+                                },
+                                blockExplorerUrls: ['https://basescan.org'],
+                            }],
+                        });
+                    } catch (addError) {
+                        throw new Error('Failed to add Base network');
+                    }
+                } else {
+                    throw switchError;
+                }
+            }
+        }
+
+        function updateUserPoints(points) {
+            // Update user points in localStorage
+            const currentPoints = parseInt(localStorage.getItem('userPoints') || '0');
+            const newPoints = currentPoints + points;
+            localStorage.setItem('userPoints', newPoints.toString());
+            
+            // Update UI if points are displayed elsewhere
+            console.log(`User earned ${points} points. Total: ${newPoints}`);
+        }
+
+        // Wallet connection functions
+        function checkWalletConnection() {
+            console.log('Checking wallet connection...');
+            
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.request({ method: 'eth_accounts' })
+                    .then(accounts => {
+                        console.log('Existing accounts:', accounts);
+                        if (accounts && accounts.length > 0) {
+                            isWalletConnected = true;
+                            userAddress = accounts[0];
+                            
+                            // Initialize ethers if available
+                            if (typeof ethers !== 'undefined') {
+                                try {
+                                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                                    signer = provider.getSigner();
+                                    console.log('Ethers initialized on page load');
+                                } catch (ethersError) {
+                                    console.log('Ethers initialization failed on page load:', ethersError);
+                                }
+                            }
+                            
+                            updateWalletUI();
+                            console.log('Wallet already connected:', userAddress);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking wallet connection:', error);
+                    });
+            } else {
+                console.log('No ethereum provider found');
+            }
+        }
+
+        async function connectWallet() {
+            console.log('Attempting to connect wallet...');
+            
+            // Check if ethereum is available
+            if (typeof window.ethereum === 'undefined') {
+                alert('Web3 wallet not found. Please install MetaMask or another Web3 wallet.');
+                return;
+            }
+
+            try {
+                // Request account access
+                console.log('Requesting accounts...');
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                console.log('Accounts received:', accounts);
+
+                if (accounts && accounts.length > 0) {
+                    isWalletConnected = true;
+                    userAddress = accounts[0];
+                    
+                    // Initialize ethers if available
+                    if (typeof ethers !== 'undefined') {
+                        try {
+                            provider = new ethers.providers.Web3Provider(window.ethereum);
+                            signer = provider.getSigner();
+                            console.log('Ethers initialized successfully');
+                        } catch (ethersError) {
+                            console.log('Ethers initialization failed, but wallet connected:', ethersError);
+                        }
+                    }
+                    
+                    updateWalletUI();
+                    console.log('Wallet connected successfully:', userAddress);
+                    alert('Wallet connected successfully!');
+                } else {
+                    alert('No accounts found. Please unlock your wallet and try again.');
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                
+                if (error.code === 4001) {
+                    alert('Connection rejected by user.');
+                } else if (error.code === -32002) {
+                    alert('Connection request already pending. Please check your wallet.');
+                } else {
+                    alert('Failed to connect wallet: ' + error.message);
+                }
+            }
+        }
+
+        function initializeEthers() {
+            try {
+                if (typeof window.ethereum !== 'undefined') {
+                    if (typeof ethers !== 'undefined') {
+                        provider = new ethers.providers.Web3Provider(window.ethereum);
+                        signer = provider.getSigner();
+                        console.log('Ethers provider initialized');
+                    } else {
+                        console.error('Ethers.js not loaded');
+                        alert('Web3 library not loaded. Please refresh the page and try again.');
+                    }
+                } else {
+                    console.error('Ethereum provider not found');
+                }
+            } catch (error) {
+                console.error('Error initializing ethers:', error);
+                alert('Error initializing wallet connection. Please refresh the page and try again.');
+            }
+        }
+
+        function updateWalletUI() {
+            console.log('Updating wallet UI...');
+            const walletBtn = document.getElementById('connectWalletBtn');
+            const walletBtnText = document.getElementById('walletBtnText');
+            
+            if (!walletBtn || !walletBtnText) {
+                console.error('Wallet UI elements not found');
+                return;
+            }
+            
+            if (isWalletConnected && userAddress) {
+                console.log('Setting connected state for address:', userAddress);
+                walletBtn.className = 'flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors';
+                walletBtnText.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+                walletBtn.onclick = function() {
+                    alert('Wallet already connected: ' + userAddress);
+                };
+            } else {
+                console.log('Setting disconnected state');
+                walletBtn.className = 'flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors';
+                walletBtnText.textContent = 'Connect Wallet';
+                walletBtn.onclick = connectWallet;
+            }
+        }
+
+        // Board navigation functions
+        function showLeaderboard() {
+            console.log('Board button clicked!');
+            // Redirect to preview.html which has the leaderboard
+            window.location.href = 'preview.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing wallet connection...');
+            checkWalletConnection();
+            
+            // Add Board button event listener
+            const boardButton = document.getElementById('boardButton');
+            if (boardButton) {
+                boardButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Board button clicked via event listener!');
+                    showLeaderboard();
+                });
+            }
+        });
+
+        // Also try immediately in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            console.log('Document still loading, waiting for DOMContentLoaded...');
+        } else {
+            console.log('Document already loaded, checking wallet connection immediately...');
+            checkWalletConnection();
+        }
+    </script>
+</body>
+</html>

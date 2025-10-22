@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/public/cd /Users/ugurockz/Desktop/horoscopemint && echo "{
+  \"version\": 2,
+  \"builds\": [
+    {
+      \"src\": \"public/**/*\",
+      \"use\": \"@vercel/static\"
+    }
+  ],
+  \"routes\": [
+    {
+      \"src\": \"/(.*)\",
+      \"dest\": \"/public/$1\"
+    }
+  ]
+}" > vercel.json"
+    }
+  ]
+}

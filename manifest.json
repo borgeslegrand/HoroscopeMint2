@@ -1,0 +1,55 @@
+{
+  "name": "HoroscopeMint",
+  "short_name": "HoroscopeMint",
+  "description": "Günlük burç yorumları ve kehanetler",
+  "start_url": "/preview.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#6b46c1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "entertainment", "utilities"],
+  "lang": "tr",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Günlük Burç",
+      "short_name": "Burç",
+      "description": "Günlük burç yorumunuzu alın",
+      "url": "/preview.html",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Profil",
+      "short_name": "Profil",
+      "description": "Profilinizi görüntüleyin",
+      "url": "/app/profile/page.tsx",
+      "icons": [
+        {
+          "src": "/logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

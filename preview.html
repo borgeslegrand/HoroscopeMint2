@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+    <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HoroscopeMint - Daily Quests</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5CF6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/animations.css">
+    <script src="js/storage.js"></script>
+    <script src="js/social.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .quest-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .quest-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .reward-badge {
+            background: rgba(255, 255, 255, 0.9);
+            color: #0a0a0a;
+            font-weight: 600;
+        }
+        
+        .completed-btn {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .pending-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4 max-w-md mx-auto">
+    <!-- Header -->
+        <div class="mb-8 relative">
+            <div class="absolute top-0 right-0">
+                <button id="connectWalletBtn" onclick="connectWallet()" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                    <span id="walletBtnText">Connect Wallet</span>
+                </button>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">Leaderboard</h1>
+            <p class="text-gray-400 text-lg">Top quest completers in the HoroscopeMint community</p>
+        </div>
+        
+        <!-- Leaderboard Content -->
+        <div class="space-y-4">
+            <!-- Your Position Card -->
+            <div class="quest-card rounded-2xl p-6 border border-white/20">
+                <h2 class="text-xl font-bold text-white text-center mb-6">Your Position</h2>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-2xl font-bold text-white">#20</div>
+                        <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                            <span class="text-xl font-bold text-gray-600">U</span>
+                        </div>
+                        <div>
+                            <div class="text-white font-semibold">ugurockz.eth</div>
+                            <div class="text-gray-400 text-sm">Streak: 1 days</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-white">71.90</div>
+                        <div class="text-gray-400 text-sm">all-time points</div>
+                    </div>
+                </div>
+                <div class="border-t border-white/20 mt-4 pt-4">
+                    <button class="w-full border border-white/30 rounded-lg px-4 py-2 text-white hover:bg-white/10 transition-colors flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                        <span>Share Position</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- All Rankings Card -->
+            <div class="quest-card rounded-2xl p-6 border border-white/20">
+                <h2 class="text-xl font-bold text-white mb-6">All Rankings</h2>
+                
+                <!-- Filter Tabs -->
+                <div class="flex space-x-2 mb-6">
+                    <button class="flex-1 bg-black/50 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                        </svg>
+                        <span>All Time</span>
+                    </button>
+                    <button class="flex-1 bg-white/10 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Weekly</span>
+                    </button>
+                    <button class="flex-1 bg-white/10 text-white px-4 py-2 rounded-lg">
+                        <span>Champions</span>
+                    </button>
+                </div>
+
+                <!-- Rankings List -->
+                <div class="space-y-3">
+                    <!-- Rank 1 -->
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-lg font-bold text-yellow-400">#1</div>
+                            <div class="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold text-white">A</span>
+                        </div>
+                            <div>
+                                <div class="text-white font-semibold">alice.eth</div>
+                                <div class="text-gray-400 text-sm">Streak: 15 days</div>
+                    </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-white">1,250.50</div>
+                            <div class="text-gray-400 text-sm">points</div>
+                        </div>
+                    </div>
+
+                    <!-- Rank 2 -->
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-lg font-bold text-gray-400">#2</div>
+                            <div class="w-8 h-8 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold text-white">B</span>
+                        </div>
+                            <div>
+                                <div class="text-white font-semibold">bob.eth</div>
+                                <div class="text-gray-400 text-sm">Streak: 12 days</div>
+                    </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-white">980.25</div>
+                            <div class="text-gray-400 text-sm">points</div>
+                        </div>
+                    </div>
+
+                    <!-- Rank 3 -->
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-lg font-bold text-orange-400">#3</div>
+                            <div class="w-8 h-8 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-bold text-white">C</span>
+                            </div>
+                            <div>
+                                <div class="text-white font-semibold">charlie.eth</div>
+                                <div class="text-gray-400 text-sm">Streak: 8 days</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-white">750.80</div>
+                            <div class="text-gray-400 text-sm">points</div>
+                    </div>
+                </div>
+
+                    <!-- More ranks... -->
+                    <div class="text-center text-gray-400 text-sm py-4">
+                        ... and 17 more players
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-black/50 backdrop-blur-lg border-t border-white/20 p-4 max-w-md mx-auto">
+            <div class="flex justify-around items-center">
+                <a href="home.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">🏠</div>
+                    <span class="text-xs font-medium">Home</span>
+                </a>
+                <a href="quest.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">⚡</div>
+                    <span class="text-xs font-medium">Quests</span>
+                </a>
+                <a href="profile.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">👤</div>
+                    <span class="text-xs font-medium">Profile</span>
+                </a>
+                <a href="faq.html" class="flex flex-col items-center space-y-1 text-white hover:text-purple-400 transition-colors">
+                    <div class="w-6 h-6">❓</div>
+                    <span class="text-xs font-medium">FAQ</span>
+                </a>
+                <button id="boardButton" class="nav-button flex flex-col items-center space-y-1 text-purple-400 bg-purple-500/20 hover:text-purple-300 transition-colors cursor-pointer" style="pointer-events: auto;">
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <span class="text-sm">🏆</span>
+                    </div>
+                    <span class="text-xs font-medium">Board</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add bottom padding to prevent overlap with navigation -->
+        <div class="h-20"></div>
+                </div>
+                
+    <script>
+        let questStatus = {
+            1: true,  // Daily check-in completed
+            2: false, // NFT mint pending
+            3: false, // Horoscope reading pending
+            4: false  // Social share pending
+        };
+
+        let isWalletConnected = false;
+        let userAddress = null;
+
+        // Check if wallet is already connected
+        function checkWalletConnection() {
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.request({ method: 'eth_accounts' })
+                    .then(accounts => {
+                        if (accounts.length > 0) {
+                            isWalletConnected = true;
+                            userAddress = accounts[0];
+                            updateWalletUI();
+                        }
+                    })
+                    .catch(console.error);
+            }
+        }
+
+        async function connectWallet() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('Please install MetaMask or a compatible wallet to continue.');
+                return;
+            }
+
+            try {
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (accounts.length > 0) {
+                    isWalletConnected = true;
+                    userAddress = accounts[0];
+                    updateWalletUI();
+                    enableQuestButtons();
+                }
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('Failed to connect wallet. Please try again.');
+            }
+        }
+
+        function updateWalletUI() {
+            const walletBtn = document.getElementById('connectWalletBtn');
+            const walletBtnText = document.getElementById('walletBtnText');
+            
+            if (isWalletConnected) {
+                walletBtn.className = 'flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors';
+                walletBtnText.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+            } else {
+                walletBtn.className = 'flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors';
+                walletBtnText.textContent = 'Connect Wallet';
+            }
+        }
+
+        function enableQuestButtons() {
+            // Enable quest buttons 2, 3, 4 (quest 1 is already completed)
+            for (let i = 2; i <= 4; i++) {
+                const btn = document.getElementById(`quest${i}Btn`);
+                btn.disabled = false;
+                btn.className = 'pending-btn px-4 py-2 rounded-lg text-sm';
+                btn.innerHTML = `<span class="flex items-center space-x-2"><span>⏳</span><span>Pending</span></span>`;
+            }
+        }
+
+        function completeQuest(questId) {
+            if (!isWalletConnected) {
+                alert('Please connect your wallet first.');
+                return;
+            }
+
+            if (questStatus[questId]) {
+                return; // Already completed
+            }
+            
+            questStatus[questId] = true;
+            const btn = document.getElementById(`quest${questId}Btn`);
+            
+            btn.className = 'completed-btn px-4 py-2 rounded-lg text-sm';
+            btn.innerHTML = `<span class="flex items-center space-x-2"><span>✓</span><span>Completed</span></span>`;
+            
+            // Show success animation
+            btn.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 200);
+
+            // Simulate blockchain transaction for quest completion
+            simulateBlockchainTransaction(questId);
+        }
+
+        function simulateBlockchainTransaction(questId) {
+            // Simulate transaction processing
+            console.log(`Quest ${questId} completed on Base network`);
+            console.log(`User address: ${userAddress}`);
+            
+            // In a real implementation, this would interact with smart contracts
+            // For now, we'll just log the completion
+            const questNames = {
+                1: 'Daily Check-in',
+                2: 'NFT Mint',
+                3: 'Horoscope Reading',
+                4: 'Social Share'
+            };
+            
+            console.log(`${questNames[questId]} quest completed successfully!`);
+        }
+
+        // Navigation functions
+        let currentView = 'leaderboard'; // Default view
+
+        function showLeaderboard() {
+            console.log('Board button clicked!');
+            currentView = 'leaderboard';
+            updateNavigation();
+            // Leaderboard content is already visible by default
+        }
+
+        function updateNavigation() {
+            // Update navigation button states
+            const navButtons = document.querySelectorAll('.nav-button');
+            navButtons.forEach(btn => {
+                btn.classList.remove('text-purple-400', 'bg-purple-500/20');
+                btn.classList.add('text-white');
+            });
+            
+            // Board button should always stay active since it's the main view
+            const boardBtn = document.getElementById('boardButton');
+            if (boardBtn) {
+                boardBtn.classList.remove('text-white');
+                boardBtn.classList.add('text-purple-400', 'bg-purple-500/20');
+            }
+        }
+
+        // Initialize wallet connection check
+        checkWalletConnection();
+        
+        // Initialize navigation
+        updateNavigation();
+        
+        // Add event listener for board button
+        document.addEventListener('DOMContentLoaded', function() {
+            const boardButton = document.getElementById('boardButton');
+            if (boardButton) {
+                boardButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Board button clicked via event listener!');
+                    showLeaderboard();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

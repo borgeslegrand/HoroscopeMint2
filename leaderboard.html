@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - Point Rankings</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+        
+        .leaderboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .leaderboard-table th {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .leaderboard-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+        
+        .leaderboard-table tr:hover {
+            background: #f8f9ff;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        .rank {
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+            width: 60px;
+        }
+        
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .user-details h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .user-details p {
+            margin: 2px 0 0 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .points {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge.gold { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #333; }
+        .badge.silver { background: linear-gradient(135deg, #c0c0c0, #e8e8e8); color: #333; }
+        .badge.bronze { background: linear-gradient(135deg, #cd7f32, #daa520); color: white; }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .leaderboard-card {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .leaderboard-table {
+                font-size: 0.9rem;
+            }
+            
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Leaderboard</h1>
+            <p>Top performers in the HoroscopeMint ecosystem</p>
+        </div>
+        
+        <div class="leaderboard-card">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPoints">0</div>
+                    <div class="stat-label">Total Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgPoints">0</div>
+                    <div class="stat-label">Average Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="topScore">0</div>
+                    <div class="stat-label">Highest Score</div>
+                </div>
+            </div>
+            
+            <button class="refresh-btn" onclick="refreshLeaderboard()">
+                🔄 Refresh Leaderboard
+            </button>
+            
+            <div id="leaderboardContent">
+                <div class="loading">
+                    <h3>Loading leaderboard...</h3>
+                    <p>Fetching the latest rankings...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data for demonstration
+        const mockLeaderboardData = [
+            {
+                rank: 1,
+                address: "0x6899c9154bdbaa0880147ca5e50a32a2cbb2e2ec",
+                username: "CryptoAstrologer",
+                points: 1250,
+                badges: ["Top Performer", "Daily Streak"],
+                checkIns: 45,
+                nftMints: 8,
+                horoscopeReads: 67
+            },
+            {
+                rank: 2,
+                address: "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6",
+                username: "StarGazer",
+                points: 980,
+                badges: ["NFT Collector"],
+                checkIns: 32,
+                nftMints: 12,
+                horoscopeReads: 44
+            },
+            {
+                rank: 3,
+                address: "0x8ba1f109551bD432803012645Hac136c4c4d8b6",
+                username: "MoonWalker",
+                points: 875,
+                badges: ["Consistent Reader"],
+                checkIns: 28,
+                nftMints: 5,
+                horoscopeReads: 33
+            },
+            {
+                rank: 4,
+                address: "0x9ca2f209661bE543904123756Hbd247d5d5e9c7",
+                username: "CosmicExplorer",
+                points: 720,
+                badges: [],
+                checkIns: 24,
+                nftMints: 3,
+                horoscopeReads: 21
+            },
+            {
+                rank: 5,
+                address: "0x1db3f310772cF654015234867Icf358e6e6f0d8",
+                username: "ZodiacMaster",
+                points: 650,
+                badges: ["Newcomer"],
+                checkIns: 18,
+                nftMints: 2,
+                horoscopeReads: 16
+            },
+            {
+                rank: 6,
+                address: "0x2ec4g421883dG765126345978Jdg469f7f7g1e9",
+                username: "AstroFan",
+                points: 580,
+                badges: [],
+                checkIns: 15,
+                nftMints: 1,
+                horoscopeReads: 14
+            },
+            {
+                rank: 7,
+                address: "0x3fd5h532994eH876237456089Keg570g8g8h2f0",
+                username: "StarSeeker",
+                points: 520,
+                badges: [],
+                checkIns: 12,
+                nftMints: 0,
+                horoscopeReads: 12
+            },
+            {
+                rank: 8,
+                address: "0x4ge6i643105fI987348567190Lfh681h9h9i3g1",
+                username: "CosmicVoyager",
+                points: 480,
+                badges: [],
+                checkIns: 10,
+                nftMints: 0,
+                horoscopeReads: 10
+            }
+        ];
+
+        function formatAddress(address) {
+            return `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'rank-1';
+            if (rank === 2) return 'rank-2';
+            if (rank === 3) return 'rank-3';
+            return '';
+        }
+
+        function getBadgeClass(badge) {
+            if (badge.includes('Top') || badge.includes('Gold')) return 'gold';
+            if (badge.includes('Silver')) return 'silver';
+            if (badge.includes('Bronze')) return 'bronze';
+            return '';
+        }
+
+        function calculateStats(data) {
+            const totalUsers = data.length;
+            const totalPoints = data.reduce((sum, user) => sum + user.points, 0);
+            const avgPoints = Math.round(totalPoints / totalUsers);
+            const topScore = Math.max(...data.map(user => user.points));
+            
+            return { totalUsers, totalPoints, avgPoints, topScore };
+        }
+
+        function renderLeaderboard(data) {
+            const stats = calculateStats(data);
+            
+            // Update stats
+            document.getElementById('totalUsers').textContent = stats.totalUsers;
+            document.getElementById('totalPoints').textContent = stats.totalPoints.toLocaleString();
+            document.getElementById('avgPoints').textContent = stats.avgPoints;
+            document.getElementById('topScore').textContent = stats.topScore;
+            
+            // Render table
+            const content = `
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Rank</th>
+                            <th>User</th>
+                            <th style="width: 100px;">Points</th>
+                            <th style="width: 200px;">Badges</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(user => `
+                            <tr>
+                                <td class="rank ${getRankClass(user.rank)}">#${user.rank}</td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar">${user.username.charAt(0).toUpperCase()}</div>
+                                        <div class="user-details">
+                                            <h3>${user.username}</h3>
+                                            <p>${formatAddress(user.address)}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="points">${user.points.toLocaleString()}</td>
+                                <td>
+                                    <div class="badges">
+                                        ${user.badges.map(badge => 
+                                            `<span class="badge ${getBadgeClass(badge)}">${badge}</span>`
+                                        ).join('')}
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('leaderboardContent').innerHTML = content;
+        }
+
+        function refreshLeaderboard() {
+            document.getElementById('leaderboardContent').innerHTML = `
+                <div class="loading">
+                    <h3>Refreshing leaderboard...</h3>
+                    <p>Updating rankings...</p>
+                </div>
+            `;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // In a real app, this would fetch from an API
+                renderLeaderboard(mockLeaderboardData);
+            }, 1500);
+        }
+
+        // Initialize leaderboard on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                renderLeaderboard(mockLeaderboardData);
+            }, 1000);
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshLeaderboard, 30000);
+    </script>
+</body>
+</html>
